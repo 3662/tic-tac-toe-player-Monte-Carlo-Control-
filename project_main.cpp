@@ -2,12 +2,24 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
+#include <time.h>
 
 using namespace std;
 
 class player {
     public:
     // methods 
+
+    player() {
+        players.push_back('x');
+        players.push_back('o');
+        epsilon = 20;
+        eval = new unordered_map<string, pair<int, int>>;
+    }
+
+    ~player() {
+        delete eval;
+    }
 
     // returns the winner of the position ('x' or 'o'), '.' for a draw or 'c' if 
     // the game continues given a position
@@ -73,27 +85,47 @@ class player {
         string bm;
         double max_score = -1;
 
+        srand((unsigned)time(NULL)); // random seed 
+        int rnd = rand() % 100;      // find random move between 0 and 99
+
+        // selects a random move epsilon % of the time 
+        if (rnd < epsilon) {
+            string random_move = lm[rand()%lm.size()];
+
+            if (eval->find(random_move) == eval->end()) {
+                eval->insert(make_pair(random_move, make_pair(1, 1)));
+            }
+
+            return random_move;
+        }
+
+        // selects best move 100 - epsilon % of the time 
         for (auto &p : lm) {
             double temp_score;
 
             // find score of position
-            auto it = eval.find(p);
+            auto it = eval->find(p);
 
-            if (it == eval.end()) {
-                // if not in the map, initialize to 1/2. that will encourage 
+            if (it == eval->end()) {
+                // if not in the map, initialize to 1. that will encourage 
                 // selection of unseen moves
-                eval.insert(make_pair(p, make_pair(1, 2)));
-                temp_score = 1/2;
+                eval->insert(make_pair(p, make_pair(1, 1)));
+                temp_score = 1;
             } else {
-                temp_score = it->second.first / it->second.second;
+                temp_score = (double)it->second.first / (double)it->second.second;
+                // cout << "temp: " << temp_score << endl;
             }
 
             if (temp_score > max_score) {
                 // update to a better move
                 bm = p;
                 max_score = temp_score;
+                // cout << "max: " << max_score << endl;
             }
         }
+
+        // cout << position << " " << bm << endl;
+        // cout << endl;
 
         return bm;
     }
@@ -106,7 +138,13 @@ class player {
         // simply updates # of wins and # of times played on each position 
         // played 
         for (auto &g : game) {
-            auto it = eval.find(g.second); // assumes the position is in eval
+            auto it = eval->find(g.second); // assumes the position is in eval
+            // if (it == eval->end()) {
+            //     cout << "hmmmmm" << endl;
+            // } else {
+            //     cout << "goood" << endl;
+            // }
+            // cout << "old: " << it->second.first << " " << it->second.second << endl;
 
             // losing or drawing results in 0
             if (g.first == winner) {
@@ -114,8 +152,51 @@ class player {
             }
 
             it->second.second += 1;
+
+            // it = eval->find(g.second); // assumes the position is in eval
+            // cout << "new: " << it->second.first << " " << it->second.second << endl;
         }
 
+    }
+
+    // display position on terminal 
+    void display_position(string position) {
+        cout << position.substr(0, 3) << endl;
+        cout << position.substr(3, 3) << endl;
+        cout << position.substr(6, 3) << endl;
+        cout << endl;
+    }
+
+    // play a game against itself using a policy based on score of positions on eval
+    // once it's complete, update eval based on final result
+    // set display true to show the game on terminal
+    char simulate_game(bool display) {
+        vector<pair<char, string>> game;   // holds game move history
+        string current_game = "........."; // initial position 
+        char winner = 'c';                 // continue game
+        int turn = 0;
+
+        while (winner == 'c') {
+            char to_move = players[turn%2];
+            // cout << current_game << " ";
+            current_game = best_move(current_game, to_move);
+            // cout << current_game << endl;
+            ++turn;
+            game.push_back(make_pair(to_move, current_game));
+            winner = find_winner(current_game);
+
+            if (display) {
+                display_position(current_game);
+            } 
+        }
+        // cout << "hereee" << endl;
+        // cout << eval->size() << endl;
+
+        // update position scores based on winner 
+        // cout << winner << endl;
+        update_eval(game, winner);
+        // cout << "hereee" << endl;
+        return winner;
     }
 
     // data
@@ -127,11 +208,34 @@ class player {
     
     // maps state to [# of wins, # of times played]
     // e.g. eval[..x......] = (1, 2)
-    unordered_map<string, pair<int, int>> eval;
+    unordered_map<string, pair<int, int>> * eval;
 
+    vector<char> players; // players 'x' or 'o'
+
+    int epsilon;       // how ofter it explores e.g. 10 means it selects a 
+                       // random move 10% of the time and the known best move 
+                       // 90% of the time 
 
 };
 
 int main() {
+    int simulations = 1000000;
+    player * test_player = new player();
+    int x = 0;
+    int o = 0;
+    int t = 0;
 
+    for (int i = 0; i < simulations; ++i) {
+        char temp = test_player->simulate_game(false);  
+        if (temp == 'x') { ++x; }
+        else if (temp == 'o') { ++o; }
+        else if (temp == '.') { ++t; }
+        // cout << "---------------------" << endl;  
+    }
+    // cout << "hererr" << endl;
+    test_player->simulate_game(true);
+    // cout << "hererrrr" << endl;
+    delete test_player;
+    // cout << "hererrrrrrrrrrrrrrrr" << endl;
+    cout << "x: " << x << " o: " << o << " t: " << t << endl;
 }
