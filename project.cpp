@@ -1,3 +1,15 @@
+/*
+author: Felipe Rodriguez Atuesta
+
+CMPUT 497 project: trains the program to play 4x4 tic-tac-toe
+
+follows a modified version of algorithm "on-policy first-visit Monte Carlo Control" 
+from book Reinforcement Learning - Sutton and Barto Second Ed. page 101
+
+no code has been copied 
+
+*/
+
 #include <iostream>
 #include <string>
 #include <vector>
@@ -206,19 +218,20 @@ class ttt {
 
     // state-action evaluation: stores the resulting position after playing a 
     // move (action) as well as number of times played and game result 
+
     // positions are stored as 16 char strings representing the 16 positions in 
     // a 4x4 tic-tac-toe. each char is {x, o, .}
     
     // maps state to [# of wins, # of times played]
     // e.g. eval[..x.............] = (1, 2) if such position has been played 2
-    // time and won one game
+    // twice and won one game
     unordered_map<string, pair<int, int>> * eval;
 
     vector<char> players; // players 'x' or 'o'
 
-    int epsilon;       // how ofter it explores e.g. 10 means it selects a 
-                       // random move 10% of the time and the known best move 
-                       // 90% of the time 
+    int epsilon;          // how ofter it explores e.g. 10 means it selects a 
+                          // random move 10% of the time and the known best move 
+                          // 90% of the time 
 
 };
 
@@ -253,12 +266,14 @@ int main() {
     int simulations;
     ttt * program = new ttt();
     
+    cout << endl;
     cout << "   ||tic-tac-toe 4x4||"                 << endl;
     cout << endl;
     cout << "   number of simulations? (1000000 recomended) "; 
     cin >> simulations;
     cout << endl;
 
+    // train the probram
     for (int i = 0; i < simulations; ++i) {
         cout << "\r" << i+1 << '/' << simulations << flush;
         program->simulate_game(false); 
@@ -284,6 +299,8 @@ int main() {
         }
 
         if (c == "p") {
+            // play against the program
+
             print_instructions();
             string current_position = "................";
             bool turn = true; // player's turn?
