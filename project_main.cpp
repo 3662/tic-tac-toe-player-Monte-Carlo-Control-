@@ -6,23 +6,24 @@
 
 using namespace std;
 
-class player {
+class ttt {
     public:
     // methods 
 
-    player() {
+    // init
+    ttt(int e = 10) {
         players.push_back('x');
         players.push_back('o');
-        epsilon = 20;
+        epsilon = e;
         eval = new unordered_map<string, pair<int, int>>;
     }
 
-    ~player() {
+    ~ttt() {
         delete eval;
     }
 
     // returns the winner of the position ('x' or 'o'), '.' for a draw or 'c' if 
-    // the game continues given a position
+    // the game continues
     char find_winner(string p) {
         // check rows 
         if (p[0] == p[1] && p[1] == p[2] && p[0] != '.') {
@@ -77,7 +78,13 @@ class player {
         }
     }
 
-    // returns best move given a position and player to play
+    // return a random integer between 0 and n-1 
+    int get_random(int n) {
+        srand((unsigned)time(NULL)); // random seed 
+        return rand() % n;
+    }
+
+    // return best move given a position and player to play
     string best_move(string position, char to_play) {
         vector<string> lm; 
         legal_moves(lm, position, to_play);
@@ -85,11 +92,8 @@ class player {
         string bm;
         double max_score = -1;
 
-        srand((unsigned)time(NULL)); // random seed 
-        int rnd = rand() % 100;      // find random move between 0 and 99
-
         // selects a random move epsilon % of the time 
-        if (rnd < epsilon) {
+        if (get_random(100) < epsilon) {
             string random_move = lm[rand()%lm.size()];
 
             if (eval->find(random_move) == eval->end()) {
@@ -113,19 +117,19 @@ class player {
                 temp_score = 1;
             } else {
                 temp_score = (double)it->second.first / (double)it->second.second;
-                // cout << "temp: " << temp_score << endl;
             }
 
             if (temp_score > max_score) {
                 // update to a better move
                 bm = p;
                 max_score = temp_score;
-                // cout << "max: " << max_score << endl;
+            } else if (temp_score == max_score) {
+                // break ties randomly
+                if (get_random(100) < 50) {
+                    bm = p;
+                }
             }
         }
-
-        // cout << position << " " << bm << endl;
-        // cout << endl;
 
         return bm;
     }
@@ -139,12 +143,6 @@ class player {
         // played 
         for (auto &g : game) {
             auto it = eval->find(g.second); // assumes the position is in eval
-            // if (it == eval->end()) {
-            //     cout << "hmmmmm" << endl;
-            // } else {
-            //     cout << "goood" << endl;
-            // }
-            // cout << "old: " << it->second.first << " " << it->second.second << endl;
 
             // losing or drawing results in 0
             if (g.first == winner) {
@@ -152,9 +150,6 @@ class player {
             }
 
             it->second.second += 1;
-
-            // it = eval->find(g.second); // assumes the position is in eval
-            // cout << "new: " << it->second.first << " " << it->second.second << endl;
         }
 
     }
@@ -178,9 +173,7 @@ class player {
 
         while (winner == 'c') {
             char to_move = players[turn%2];
-            // cout << current_game << " ";
             current_game = best_move(current_game, to_move);
-            // cout << current_game << endl;
             ++turn;
             game.push_back(make_pair(to_move, current_game));
             winner = find_winner(current_game);
@@ -189,13 +182,10 @@ class player {
                 display_position(current_game);
             } 
         }
-        // cout << "hereee" << endl;
-        // cout << eval->size() << endl;
 
         // update position scores based on winner 
-        // cout << winner << endl;
         update_eval(game, winner);
-        // cout << "hereee" << endl;
+        
         return winner;
     }
 
@@ -219,8 +209,8 @@ class player {
 };
 
 int main() {
-    int simulations = 1000000;
-    player * test_player = new player();
+    int simulations = 100000;
+    ttt * test_player = new ttt();
     int x = 0;
     int o = 0;
     int t = 0;
@@ -229,13 +219,12 @@ int main() {
         char temp = test_player->simulate_game(false);  
         if (temp == 'x') { ++x; }
         else if (temp == 'o') { ++o; }
-        else if (temp == '.') { ++t; }
-        // cout << "---------------------" << endl;  
+        else if (temp == '.') { ++t; } 
     }
-    // cout << "hererr" << endl;
+    
     test_player->simulate_game(true);
-    // cout << "hererrrr" << endl;
+    cout << test_player->eval->size() << endl;
     delete test_player;
-    // cout << "hererrrrrrrrrrrrrrrr" << endl;
+    
     cout << "x: " << x << " o: " << o << " t: " << t << endl;
 }
