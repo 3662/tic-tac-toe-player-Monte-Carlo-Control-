@@ -3,13 +3,14 @@ Felipe Rodriguez Atuesta
 CMPUT 497 Project
 
 Project Overview:  
-The user is able to train a program to play 4x4 tic-tac-toe using a reinforcement learning algorithm. 
+The user is able to train a program to play tic-tac-toe using a reinforcement learning algorithm. 
 After the training is completed, the user can play against the program or watch it play against itself.
 
 How To Play:
 1- Compile and run file "project.cpp"
 2- First need to train the program: Input the number of simulations (roughly speaking the bigger the 
-   number the stronger the program) the program will perform during training
+   number the stronger the program) the program will perform during training. 100000 or more are 
+   recommended
 3- follow the menu and instructions 
 
 
@@ -31,7 +32,4 @@ Setup:
   - Epsilon is set to 10 (explores 0.1 and exploits 0.9)
   - Positions are initialized to 1 to encourage selection of unseen positions
   - At the end of the game, simply update the value of each position seen 
-  
-Some challenges:
-  - The program requires a large number of simulations to be strong against human opponents
 ```
