@@ -30,5 +30,5 @@ Setup:
   - The policy is simply select the legal move (position) with the highest value
   - Epsilon is set to 10 (explores 0.1 and exploits 0.9)
   - Positions are initialized to 1 to encourage selection of unseen positions
-  - At the end of the game, simply update the value of each position seen 
+  - At the end of a game, simply update the value of each position seen 
 ```
