@@ -8,9 +8,8 @@ After the training is completed, the user can play against the program or watch 
 
 How To Play:
 1- Compile and run file "project.cpp"
-2- First need to train the program: Input the number of simulations (roughly speaking the bigger the 
-   number the stronger the program) the program will perform during training. 100000 or more are 
-   recommended
+2- First need to train the program: Input the number of simulations the program will perform during training 
+   (roughly speaking the bigger the number the stronger the program). 100000 or more are recommended
 3- follow the menu and instructions 
 
 
