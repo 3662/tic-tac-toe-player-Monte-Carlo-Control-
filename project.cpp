@@ -38,7 +38,7 @@ class ttt {
     // play a game against itself using a policy based on score of positions on eval
     // once it's complete, update eval based on final result
     // set display true to show the game on terminal
-    char simulate_game(bool display) {
+    char simulate_game(bool display, bool explore = true) {
         vector<pair<char, string>> game;          // holds game move history
         string current_game = "................"; // initial position 
         char winner = 'c';                        // continue game
@@ -46,7 +46,7 @@ class ttt {
 
         while (winner == 'c') {
             char to_move = players[turn%2];
-            current_game = best_move(current_game, to_move);
+            current_game = best_move(current_game, to_move, explore);
             ++turn;
             game.push_back(make_pair(to_move, current_game));
             winner = find_winner(current_game);
@@ -269,7 +269,7 @@ int main() {
     cout << endl;
     cout << "   ||tic-tac-toe 4x4||"                 << endl;
     cout << endl;
-    cout << "   number of simulations? (1000000 recomended) "; 
+    cout << "   number of simulations? "; 
     cin >> simulations;
     cout << endl;
 
@@ -290,7 +290,7 @@ int main() {
 
         if (c == "w") {
             // watch a game 
-            game_result = program->simulate_game(true);
+            game_result = program->simulate_game(true, false);
 
             if (game_result == 'x') { cout << " x wins" << endl; }
             if (game_result == 'o') { cout << " o wins" << endl; }
