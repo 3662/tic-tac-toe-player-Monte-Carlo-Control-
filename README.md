@@ -23,7 +23,7 @@ the following algorith:
     Reinforcement Learning - Sutton and Barto, Second Ed. Page 101
 
 ```
-Some of the changes:
+Setup:
   - The state/action pair "Q(s, a)" is combined to simply the state that results after making a move
   - "Returns(s, a)" are pairs [# of wins, # of times played] of a position
   - The value of a position is equal # of wins / # of times played 
