@@ -1,7 +1,7 @@
 /*
 author: Felipe Rodriguez Atuesta
 
-CMPUT 497 project: trains the program to play 4x4 tic-tac-toe
+CMPUT 497 project: trains the program to play 3x3 tic-tac-toe
 
 follows a modified version of algorithm "on-policy first-visit Monte Carlo Control" 
 from book Reinforcement Learning - Sutton and Barto Second Ed. page 101
@@ -19,7 +19,7 @@ no code has been copied
 
 using namespace std;
 
-// train and play 4x4 tic-tac-toe
+// train and play tic-tac-toe
 class ttt {
     public:
 
@@ -40,7 +40,7 @@ class ttt {
     // set display true to show the game on terminal
     char simulate_game(bool display, bool explore = true) {
         vector<pair<char, string>> game;          // holds game move history
-        string current_game = "................"; // initial position 
+        string current_game = ".........";        // initial position 
         char winner = 'c';                        // continue game
         int turn = 0;
 
@@ -116,39 +116,33 @@ class ttt {
     // the game continues
     char find_winner(string p) {
         // check rows 
-        if (p[0] == p[1] && p[1] == p[2] && p[2] == p[3] && p[0] != '.') {
+        if (p[0] == p[1] && p[1] == p[2] && p[0] != '.') {
             return p[0];
         }
-        if (p[4] == p[5] && p[5] == p[6] && p[6] == p[7] && p[4] != '.') {
-            return p[4];
+        if (p[3] == p[4] && p[4] == p[5] && p[3] != '.') {
+            return p[3];
         }
-        if (p[8] == p[9] && p[9] == p[10] && p[10] == p[11] && p[8] != '.') {
-            return p[8];
-        }
-        if (p[12] == p[13] && p[13] == p[14] && p[14] == p[15] && p[12] != '.') {
-            return p[12];
+        if (p[6] == p[7] && p[7] == p[8] && p[6] != '.') {
+            return p[6];
         }
 
         // check columns
-        if (p[0] == p[4] && p[4] == p[8] && p[8] == p[12] && p[0] != '.') {
+        if (p[0] == p[3] && p[3] == p[6] && p[0] != '.') {
             return p[0];
         }
-        if (p[1] == p[5] && p[5] == p[9] && p[9] == p[13] && p[1] != '.') {
-            return p[4];
+        if (p[1] == p[4] && p[4] == p[7] && p[1] != '.') {
+            return p[1];
         }
-        if (p[2] == p[6] && p[6] == p[10] && p[10] == p[14] && p[2] != '.') {
+        if (p[2] == p[5] && p[5] == p[8] && p[2] != '.') {
             return p[2];
-        }
-        if (p[3] == p[7] && p[7] == p[11] && p[11] == p[15] && p[3] != '.') {
-            return p[3];
         }
 
         // check diagonals 
-        if (p[0] == p[5] && p[5] == p[10] && p[10] == p[15] && p[0] != '.') {
+        if (p[0] == p[4] && p[4] == p[8] && p[0] != '.') {
             return p[0];
         }
-        if (p[3] == p[6] && p[6] == p[9] && p[9] == p[12] && p[3] != '.') {
-            return p[3];
+        if (p[2] == p[4] && p[4] == p[6] && p[2] != '.') {
+            return p[2];
         }
 
         // check if game can continue i.e. at least one empty space 
@@ -164,10 +158,9 @@ class ttt {
 
     // display position on terminal 
     void display_position(string position) {
-        cout << "   " << position.substr(0, 4)  << endl;
-        cout << "   " << position.substr(4, 4)  << endl;
-        cout << "   " << position.substr(8, 4)  << endl;
-        cout << "   " << position.substr(12, 4) << endl;
+        cout << "   " << position.substr(0, 3)  << endl;
+        cout << "   " << position.substr(3, 3)  << endl;
+        cout << "   " << position.substr(6, 3)  << endl;
         cout << endl;
 
         sleep(1);
@@ -220,10 +213,10 @@ class ttt {
     // move (action) as well as number of times played and game result 
 
     // positions are stored as 16 char strings representing the 16 positions in 
-    // a 4x4 tic-tac-toe. each char is {x, o, .}
+    // a 3x3 tic-tac-toe. each char is {x, o, .}
     
     // maps state to [# of wins, # of times played]
-    // e.g. eval[..x.............] = (1, 2) if such position has been played 2
+    // e.g. eval[..x......] = (1, 2) if such position has been played 2
     // twice and won one game
     unordered_map<string, pair<int, int>> * eval;
 
@@ -251,11 +244,11 @@ void print_instructions() {
 
 // given a move and position return true if legal
 bool is_legal_move(int row, int col, string p) {
-    if (row < 0 || row > 3 || col < 0 || col > 3) {
+    if (row < 0 || row > 2 || col < 0 || col > 2) {
         return false;
     }
     // checks if place is empty
-    if (p[row*4 + col] != '.') {
+    if (p[row*3 + col] != '.') {
         return false;
     }
 
@@ -267,9 +260,9 @@ int main() {
     ttt * program = new ttt();
     
     cout << endl;
-    cout << "   ||tic-tac-toe 4x4||"                 << endl;
+    cout << "   ||tic-tac-toe||"                 << endl;
     cout << endl;
-    cout << "   number of simulations? "; 
+    cout << "   number of simulations? (recommended 100000+) "; 
     cin >> simulations;
     cout << endl;
 
@@ -302,14 +295,12 @@ int main() {
             // play against the program
 
             print_instructions();
-            string current_position = "................";
-            bool turn = true; // player's turn?
+            string current_position = ".........";
+            bool turn = false; // player's turn?
 
             game_result = 'c';
 
             while (game_result == 'c') {
-                program->display_position(current_position);
-
                 if (turn) {
                     // player's turn 
                     int row, col;
@@ -320,20 +311,19 @@ int main() {
                         cout << "   illegal move" << endl;
                         cout << endl;
                     } else {
-                        current_position[row*4 + col] = 'x';
+                        current_position[row*3 + col] = 'o';
                         turn = !turn;
                     }
                 } else {
                     // pc turn 
                     cout << "   computer move: " << endl;;
                     current_position = 
-                               program->best_move(current_position, 'o', false);
+                               program->best_move(current_position, 'x', false);
                     turn = !turn;
                 }
                 game_result = program->find_winner(current_position);
+                program->display_position(current_position);
             }
-
-            program->display_position(current_position);
 
             if (game_result == 'x') { cout << " x wins" << endl; }
             if (game_result == 'o') { cout << " o wins" << endl; }
